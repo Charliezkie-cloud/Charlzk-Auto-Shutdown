@@ -8,7 +8,7 @@ from pathlib import Path
 # Explicit imports to satisfy Flake8
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, messagebox
 from pynput.mouse import Listener
-import keyboard, os, time
+import keyboard, os, time, threading
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / "assets" / "frame0"
@@ -20,7 +20,7 @@ def relative_to_assets(path: str) -> Path:
 
 window = Tk()
 
-# window.iconbitmap("./assets/icon.ico")
+window.iconbitmap("./assets/icon.ico")
 window.attributes("-topmost", True)
 window.title("Charlzk Auto Shutdown")
 window.geometry("720x512")
@@ -56,12 +56,12 @@ timerLabel = canvas.create_text(
     278.0,
     251.0,
     anchor="nw",
-    text="7 Minutes and 60 Seconds",
+    text="4 Minutes and 60 Seconds",
     fill="#FFFFFF",
     font=("Arial Bold", 13 * -1),
 )
 
-minutes = 7
+minutes = 5
 countdownTime = minutes * 60
 isCounting = False
 
@@ -89,6 +89,9 @@ def updateTimer():
 
     isCounting = True
 
+    def showMessageBox():
+        messagebox.showinfo("Notice", "Shutting down...")
+
     if isCounting:
         if countdownTime == 60:
             window.deiconify()
@@ -96,14 +99,12 @@ def updateTimer():
         minutes, seconds = divmod(countdownTime, 60)
 
         if countdownTime >= 0:
-            canvas.itemconfig(
-                timerLabel, text=f"{minutes} Minutes and {seconds} Seconds."
-            )
+            canvas.itemconfig(timerLabel, text=f"{minutes} Minutes and {seconds} Seconds.")
             window.after(1000, updateTimer)
             countdownTime -= 1
         else:
             isCounting = False
-            messagebox.showerror("Notice", "Shutting down...")
+            threading.Thread(target=showMessageBox).start()
             time.sleep(1)
             os.system("shutdown /s /f /t 0")
 
