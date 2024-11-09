@@ -20,7 +20,7 @@ def relative_to_assets(path: str) -> Path:
 
 window = Tk()
 
-window.iconbitmap("./assets/icon.ico")
+window.iconbitmap(os.path.join(Path(__file__).parent, "assets", "icon.ico"))
 window.attributes("-topmost", True)
 window.title("Charlzk Auto Shutdown")
 window.geometry("720x512")
